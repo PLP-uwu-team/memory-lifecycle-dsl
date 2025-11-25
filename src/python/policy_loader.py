@@ -1,6 +1,3 @@
-from antlr4 import *
-from MemoryPolicyLexer import MemoryPolicyLexer
-from MemoryPolicyParser import MemoryPolicyParser
 from MemoryPolicyVisitor import MemoryPolicyVisitor
 
 

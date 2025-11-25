@@ -1,4 +1,4 @@
-from antlr4 import *
+from antlr4 import CommonTokenStream, FileStream
 from MemoryPolicyLexer import MemoryPolicyLexer
 from MemoryPolicyParser import MemoryPolicyParser
 from policy_loader import PolicyLoader
