@@ -1,0 +1,5 @@
+track_memory {
+  allocate_by: ["malloc", "calloc"]
+  deallocate_by: ["free"]
+  transfer_ownership: ["StorePointerInGlobalList"]
+}

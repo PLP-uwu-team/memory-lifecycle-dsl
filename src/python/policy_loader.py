@@ -11,10 +11,13 @@ class PolicyLoader(MemoryPolicyVisitor):
         self.transfer = []
 
     def visitAllocateBlock(self, ctx):
-        self.allocate = [s.getText().strip('"') for s in ctx.list().STRING()]
+        self.allocate = [s.getText().strip('"') for s in ctx.list_().STRING()]
+        return None
 
     def visitDeallocateBlock(self, ctx):
-        self.deallocate = [s.getText().strip('"') for s in ctx.list().STRING()]
+        self.deallocate = [s.getText().strip('"') for s in ctx.list_().STRING()]
+        return None
 
     def visitTransferBlock(self, ctx):
-        self.transfer = [s.getText().strip('"') for s in ctx.list().STRING()]
+        self.transfer = [s.getText().strip('"') for s in ctx.list_().STRING()]
+        return None
