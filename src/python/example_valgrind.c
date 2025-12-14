@@ -16,10 +16,9 @@ int main(int argc, char* argv[]) {
 
     // Skenario 1: Alokasi tapi LUPA di-free (LEAK!)
     void* p1 = my_alloc(100);
-    
+
     // Skenario 2: Alokasi dan di-free (AMAN)
     void* p2 = my_alloc(50);
-    my_free(p2);
 
     // Kita sengaja tidak mem-free p1 untuk memancing Valgrind
     return 0;
