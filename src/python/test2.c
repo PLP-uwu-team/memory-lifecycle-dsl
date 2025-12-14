@@ -1,9 +1,9 @@
-
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h> // Tambahan untuk memset
 
 /* =========================
-   GLOBAL STORAGE (TRANSFER TARGET)
+   BAGIAN 1: LOGIKA ASLI ANDA (JANGAN DIHAPUS)
    ========================= */
 
 typedef struct Node {
@@ -13,25 +13,13 @@ typedef struct Node {
 
 static Node* global_list = NULL;
 
-/* =========================
-   ALLOCATION
-   ========================= */
-
 void* my_alloc(size_t size) {
     return malloc(size);
 }
 
-/* =========================
-   DEALLOCATION
-   ========================= */
-
 void my_free(void* ptr) {
     free(ptr);
 }
-
-/* =========================
-   TRANSFER OWNERSHIP
-   ========================= */
 
 void StorePointerInGlobalList(void* ptr) {
     Node* n = (Node*)ptr;
@@ -39,42 +27,51 @@ void StorePointerInGlobalList(void* ptr) {
     global_list = n;
 }
 
-/* =========================
-   NORMAL FLOW: ALLOC + FREE
-   ========================= */
-
 void process_and_free(int x) {
     Node* n = (Node*)my_alloc(sizeof(Node));
     n->value = x;
-
-    /* ownership stays here */
     my_free(n);
 }
-
-/* =========================
-   TRANSFER FLOW: ALLOC + TRANSFER
-   ========================= */
 
 void process_and_store(int x) {
     Node* n = (Node*)my_alloc(sizeof(Node));
     n->value = x;
-
-    /* ownership transferred */
     StorePointerInGlobalList(n);
 }
 
 /* =========================
-   GLOBAL CLEANUP (OPTIONAL)
+   BAGIAN 2: TAMBAHAN VISUALISASI (MASSIF DEMO)
    ========================= */
+// Fungsi ini ditambahkan agar grafiknya terlihat naik-turun cantik
 
-void cleanup_global_list() {
-    Node* cur = global_list;
-    while (cur) {
-        Node* next = cur->next;
-        free(cur);
-        cur = next;
+#define DEMO_BLOCKS 10
+#define DEMO_SIZE 500000 // 500KB
+
+void burn_cpu_cycles() {
+    volatile int sum = 0; 
+    for (int i = 0; i < 3000000; i++) sum += i; // Loop berat untuk delay
+}
+
+void run_visual_demo_spike() {
+    printf("\n--- [START] Visual Demo (Massif Spike) ---\n");
+    int* ptrs[DEMO_BLOCKS];
+
+    // GRAFIK NAIK
+    for(int i=0; i<DEMO_BLOCKS; i++) {
+        ptrs[i] = malloc(DEMO_SIZE);
+        if(ptrs[i]) memset(ptrs[i], 0, DEMO_SIZE); // Pakai memori fisik
+        burn_cpu_cycles();
     }
-    global_list = NULL;
+    
+    printf(">> Puncak Memori Tercapai (Lihat Puncak Grafik)\n");
+    burn_cpu_cycles();
+
+    // GRAFIK TURUN
+    for(int i=0; i<DEMO_BLOCKS; i++) {
+        free(ptrs[i]);
+        burn_cpu_cycles();
+    }
+    printf("--- [END] Visual Demo Selesai ---\n");
 }
 
 /* =========================
@@ -82,10 +79,15 @@ void cleanup_global_list() {
    ========================= */
 
 int main() {
-    process_and_free(10);     // SAFE
-    process_and_store(20);    // OWNERSHIP TRANSFERRED
-    process_and_store(30);    // OWNERSHIP TRANSFERRED
+    // 1. Jalankan Logika Bisnis Asli (Cepat, grafik datar)
+    printf(">> Menjalankan Logika Linked List...\n");
+    process_and_free(10);     
+    process_and_store(20);    
+    process_and_store(30);    
 
-    /* program ends without calling cleanup_global_list */
+    // 2. Jalankan Demo Visualisasi (Lambat, grafik gunung)
+    run_visual_demo_spike();
+
+    /* Program berakhir tanpa cleanup global_list (LEAK disengaja dari logika asli) */
     return 0;
 }

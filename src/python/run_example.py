@@ -93,7 +93,7 @@ if __name__ == "__main__":
         sys.exit(1)
 
     # B. Run Verification
-    binary_target = "./example_valgrind" 
+    binary_target = "./test2" 
     
     # 1. Cek Safety (Leak & Mismatch)
     check_memory_with_valgrind(binary_target, policy.pairs)

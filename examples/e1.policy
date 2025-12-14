@@ -1,6 +1,5 @@
 track_memory {
-<<<<<<< HEAD
-  // Komentar sekarang sudah aman
+  // 1. Pasangan Standar C
   pair {
     allocator: "malloc"
     deallocator: "free"
@@ -11,15 +10,13 @@ track_memory {
     deallocator: "free"
   }
   
-  // Kalau ada function custom
-  // pair {
-  //   allocator: "my_alloc"
-  //   deallocator: "my_free"
-  // }
+  // 2. Pasangan Custom (Untuk test2.c)
+  // Kita tambahkan ini agar DSL mengenali fungsi Anda
+  pair {
+    allocator: "my_alloc"
+    deallocator: "my_free"
+  }
 
-=======
-  allocate_by: ["malloc", "calloc", "realloc"]
-  deallocate_by: ["free"]
->>>>>>> 395a909e7be145586d85a45970f2285f925b8d35
+  // 3. Aturan Transfer Ownership
   transfer_ownership: ["StorePointerInGlobalList"]
 }
