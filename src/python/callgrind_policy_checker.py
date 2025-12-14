@@ -1,6 +1,8 @@
 import os
 import subprocess
 import tempfile
+import xml.etree.ElementTree as ET
+from collections import defaultdict
 
 
 def generate_callgraph_svg(binary_path):
@@ -49,10 +51,6 @@ def generate_callgraph_svg(binary_path):
             svg_data = f.read()
 
     return svg_data
-
-
-import xml.etree.ElementTree as ET
-from collections import defaultdict
 
 
 def parse_svg_callgraph(svg_text):

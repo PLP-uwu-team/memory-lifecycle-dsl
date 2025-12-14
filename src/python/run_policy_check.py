@@ -33,9 +33,9 @@ if __name__ == "__main__":
 
     for r in results:
         icon = {
-            "OK": "✅",
-            "WARNING": "⚠️",
-            "ERROR": "❌",
+            "OK": "[OK]",
+            "WARNING": "[WARN]",
+            "ERROR": "[ERR]",
         }[r["severity"]]
 
         print(f"{icon} {r['function']}: {r['status']}")
