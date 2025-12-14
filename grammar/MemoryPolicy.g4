@@ -1,21 +1,31 @@
 grammar MemoryPolicy;
 
 policy
-    : 'track_memory' '{'
-        allocateBlock?
-        deallocateBlock?
-        transferBlock?
-      '}'
-      EOF
+    : 'track_memory' '{' policyRule* '}' EOF
     ;
 
-allocateBlock     : 'allocate_by' ':' list ;
-deallocateBlock   : 'deallocate_by' ':' list ;
-transferBlock     : 'transfer_ownership' ':' list ;
+// Ganti 'rule' jadi 'policyRule' biar gak konflik
+policyRule
+    : pairRule
+    | transferRule
+    ;
 
-list
+pairRule
+    : 'pair' '{'
+        'allocator' ':' allocator=STRING
+        'deallocator' ':' deallocator=STRING
+      '}'
+    ;
+
+transferRule
+    // Ganti 'list' jadi 'functionList'
+    : 'transfer_ownership' ':' functionList
+    ;
+
+functionList
     : '[' (STRING (',' STRING)*)? ']'
     ;
 
 STRING : '"' (~["\r\n])* '"' ;
+COMMENT : '//' ~[\r\n]* -> skip ;
 WS     : [ \t\r\n]+ -> skip ;

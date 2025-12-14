@@ -1,5 +1,20 @@
 track_memory {
-  allocate_by: ["malloc", "calloc"]
-  deallocate_by: ["free"]
+  // Komentar sekarang sudah aman
+  pair {
+    allocator: "malloc"
+    deallocator: "free"
+  }
+
+  pair {
+    allocator: "calloc"
+    deallocator: "free"
+  }
+  
+  // Kalau ada function custom
+  // pair {
+  //   allocator: "my_alloc"
+  //   deallocator: "my_free"
+  // }
+
   transfer_ownership: ["StorePointerInGlobalList"]
 }
