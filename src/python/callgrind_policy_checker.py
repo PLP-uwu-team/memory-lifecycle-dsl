@@ -150,11 +150,34 @@ def reaches_down(graph, start, targets):
     return False
 
 
-def ownership_freed(graph, rev_graph, alloc_fn, free_fns):
-    """
-    Walk UP to callers.
-    For each caller, check if it (or below it) calls free.
-    """
+def ownership_resolutions(graph, rev_graph, alloc_fn, free_fns, transfer_fns):
+    visited = set()
+    stack = [alloc_fn]
+    outcomes = set()
+
+    while stack:
+        cur = stack.pop()
+        if cur in visited:
+            continue
+        visited.add(cur)
+
+        if reaches_down(graph, cur, free_fns):
+            outcomes.add("FREED")
+
+        if reaches_down(graph, cur, transfer_fns):
+            outcomes.add("TRANSFERRED")
+
+        for e in rev_graph.get(cur, []):
+            if e["calls"] > 0:
+                stack.append(e["caller"])
+
+    if not outcomes:
+        outcomes.add("LEAK")
+
+    return outcomes
+
+
+def ownership_resolved(graph, rev_graph, alloc_fn, free_fns, transfer_fns):
     visited = set()
     stack = [alloc_fn]
 
@@ -164,16 +187,20 @@ def ownership_freed(graph, rev_graph, alloc_fn, free_fns):
             continue
         visited.add(cur)
 
-        # Does THIS owner free it (directly or indirectly)?
+        # 1️⃣ Kalau owner ini (atau bawahnya) free → OK
         if reaches_down(graph, cur, free_fns):
-            return True
+            return "FREED"
 
-        # Otherwise, ownership propagates upward
+        # 2️⃣ Kalau owner ini (atau bawahnya) transfer ownership → STOP
+        if reaches_down(graph, cur, transfer_fns):
+            return "TRANSFERRED"
+
+        # 3️⃣ Kalau belum, naik ke caller
         for e in rev_graph.get(cur, []):
             if e["calls"] > 0:
                 stack.append(e["caller"])
 
-    return False
+    return "LEAK"
 
 
 def check_policy_with_callgrind(binary_path, policy):
@@ -183,6 +210,7 @@ def check_policy_with_callgrind(binary_path, policy):
 
     allocs = policy.allocate
     frees = set(policy.deallocate)
+    transfers = set(policy.transfer)
 
     results = []
 
@@ -197,23 +225,19 @@ def check_policy_with_callgrind(binary_path, policy):
             )
             continue
 
-        freed = ownership_freed(graph, rev_graph, alloc, frees)
+        outcomes = ownership_resolutions(graph, rev_graph, alloc, frees, transfers)
 
-        if freed:
-            results.append(
-                {
-                    "function": alloc,
-                    "severity": "OK",
-                    "status": "OWNERSHIP FREED",
-                }
-            )
+        if "LEAK" in outcomes:
+            severity = "WARNING"
         else:
-            results.append(
-                {
-                    "function": alloc,
-                    "severity": "WARNING",
-                    "status": "LEAKED OWNERSHIP",
-                }
-            )
+            severity = "OK"
+
+        results.append(
+            {
+                "function": alloc,
+                "severity": severity,
+                "status": ", ".join(sorted(outcomes)),
+            }
+        )
 
     return results

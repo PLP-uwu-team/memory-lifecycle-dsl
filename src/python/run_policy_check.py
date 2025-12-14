@@ -18,7 +18,7 @@ def load_policy(path):
 
 
 if __name__ == "__main__":
-    policy_path = "../../examples/e1.policy"
+    policy_path = "../../examples/e2.policy"
     binary_path = "./example_valgrind"
 
     policy = load_policy(policy_path)
