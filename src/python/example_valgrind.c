@@ -18,6 +18,7 @@ int main() {
 
     printf("--- [START] Demo Alokasi Memori ---\n");
 
+<<<<<<< HEAD
     // FASE 1: Alokasi Bertahap (Grafik NAIK)
     printf(">> Mengalokasikan memori...\n");
     for (int i = 0; i < NUM_BLOCKS; i++) {
@@ -28,6 +29,13 @@ int main() {
         if (ptrs[i] != NULL) {
             memset(ptrs[i], 0, BLOCK_SIZE);
         }
+=======
+    // Skenario 1: Alokasi tapi LUPA di-free (LEAK!)
+    void* p1 = my_alloc(100);
+
+    // Skenario 2: Alokasi dan di-free (AMAN)
+    void* p2 = my_alloc(50);
+>>>>>>> 395a909e7be145586d85a45970f2285f925b8d35
 
         // 3. Buang waktu sedikit agar grafik tidak tegak lurus
         burn_cpu_cycles();

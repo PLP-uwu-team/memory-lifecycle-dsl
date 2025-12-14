@@ -1,4 +1,5 @@
 track_memory {
+<<<<<<< HEAD
   // Komentar sekarang sudah aman
   pair {
     allocator: "malloc"
@@ -16,5 +17,9 @@ track_memory {
   //   deallocator: "my_free"
   // }
 
+=======
+  allocate_by: ["malloc", "calloc", "realloc"]
+  deallocate_by: ["free"]
+>>>>>>> 395a909e7be145586d85a45970f2285f925b8d35
   transfer_ownership: ["StorePointerInGlobalList"]
 }
