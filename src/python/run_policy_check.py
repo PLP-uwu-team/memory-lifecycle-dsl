@@ -1,25 +1,45 @@
 from antlr4 import CommonTokenStream, FileStream
 from callgrind_policy_checker import check_policy_with_callgrind
+from error_handler import (
+    DSLSemanticError,
+    DSLSyntaxError,
+    MemoryPolicyErrorListener,
+    validate_policy,
+)
 from MemoryPolicyLexer import MemoryPolicyLexer
 from MemoryPolicyParser import MemoryPolicyParser
 from policy_loader import PolicyLoader
 
 
 def load_policy(path):
-    input_stream = FileStream(path)
-    lexer = MemoryPolicyLexer(input_stream)
-    tokens = CommonTokenStream(lexer)
-    parser = MemoryPolicyParser(tokens)
-    tree = parser.policy()
+    try:
+        input_stream = FileStream(path)
+        lexer = MemoryPolicyLexer(input_stream)
+        tokens = CommonTokenStream(lexer)
+        parser = MemoryPolicyParser(tokens)
 
-    loader = PolicyLoader()
-    loader.visit(tree)
-    return loader
+        # Pasang custom error handler
+        parser.removeErrorListeners()
+        parser.addErrorListener(MemoryPolicyErrorListener())
+
+        tree = parser.policy()
+
+        loader = PolicyLoader()
+        loader.visit(tree)
+
+        # Semantic validation
+        validate_policy(loader)
+
+        return loader
+
+    except (DSLSyntaxError, DSLSemanticError) as e:
+        print(e)
+        exit(1)
 
 
 if __name__ == "__main__":
     policy_path = "../../examples/e2.policy"
-    binary_path = "./example_valgrind"
+    binary_path = "./test2"
 
     policy = load_policy(policy_path)
 
