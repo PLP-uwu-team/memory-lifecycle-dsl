@@ -219,7 +219,7 @@ def check_policy_with_callgrind(binary_path, policy):
             results.append(
                 {
                     "function": alloc,
-                    "severity": "ERROR",
+                    "severity": "OK",
                     "status": "NOT CALLED",
                 }
             )
@@ -228,7 +228,7 @@ def check_policy_with_callgrind(binary_path, policy):
         outcomes = ownership_resolutions(graph, rev_graph, alloc, frees, transfers)
 
         if "LEAK" in outcomes:
-            severity = "WARNING"
+            severity = "ERROR"
         else:
             severity = "OK"
 
